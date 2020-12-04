@@ -93,7 +93,6 @@ const parsePassport = (data) => {
     let count = 0
     let p = new Passport()
     data.forEach(line => {
-        line.trim()
         if(line.includes('byr')){
             let val = filter('byr', line)
             p.byr = validateByr(val)
