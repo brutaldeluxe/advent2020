@@ -6,13 +6,15 @@ const loadData = () => {
 }
 
 class Passport {
-    byr = false
-    iyr = false
-    eyr = false
-    hgt = false
-    hcl = false
-    ecl = false
-    pid = false
+    constructor(){
+        this.byr = false
+        this.iyr = false
+        this.eyr = false
+        this.hgt = false
+        this.hcl = false
+        this.ecl = false
+        this.pid = false
+    }
     isValid = function() {
         if(this.byr == true && this.iyr == true && this.eyr == true && this.hgt == true && this.hcl == true && this.ecl == true && this.pid == true){
             return true
@@ -132,24 +134,3 @@ const parsePassport = (data) => {
 
 const data = loadData();
 console.log(parsePassport(data))
-
-/*
-console.log(validateByr('2002'))
-
-console.log(validateByr('2003'))
-/*
-console.log('should be true '+validateIyr('2010'))
-console.log('should be false '+validateIyr('2009'))
-console.log('shoudl be true '+validateEyr('2020'))
-console.log('shoudl be False '+validateEyr('2019'))
-console.log('should be true '+validateHeight('60in'))
-console.log('should be false '+validateHeight('190in'))
-console.log('should be true '+validateHeight('190cm'))
-console.log('should be false '+validateHeight('190'))
-console.log('should be true '+validateHairColor('#123abc'))
-console.log('should be false '+validateHairColor('#123abz'))
-console.log('should be false '+validateHairColor('123abc'))
-console.log('shoudl be true '+validateEyeColor('brn'))
-console.log('shoudl be false '+validateEyeColor('wat'))
-console.log('should be true '+validatePid('093154719'))
-console.log('should be false '+validatePid('0123456789'))*/
