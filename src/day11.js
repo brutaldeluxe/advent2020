@@ -6,7 +6,6 @@ const loadData = () => {
 
     return Array.from(buffer.toString().split('\n'), line => {
         width = line.length
-        console.log(width)
         return Array.from(line)
     }).flat()
 }
@@ -29,34 +28,55 @@ const translate = (pos) => {
     }
 }
 
+const findSeat = (seating, pos, dirX=0, dirY=0) => {
+    let i = 1
+    let {x, y} = translate(pos)
+    let s = null
+    while(s != undefined || s !='.'){
+        s = seat(seating, x+dirX*i, y+dirY*i)
+        i++
+        if(s === '#'){
+            return '#'
+        }
+        if(s === 'L'){
+            return 'L'
+        }
+        if(i>width){
+            return undefined
+        }
+    }
+    
+    return seat
+}
+
 const isEmpty = (seating, pos) => {
     let {x,y} = translate(pos)
     return (
-    (seat(seating, x-1, y-1) !== '#') &&
-    (seat(seating, x, y-1) !== '#') &&
-    (seat(seating, x+1, y-1) !== '#') &&
-    (seat(seating, x-1, y) !== '#') &&
+    (findSeat(seating, pos, -1, -1) !== '#') &&
+    (findSeat(seating, pos, 0, -1) !== '#') &&
+    (findSeat(seating, pos, 1, -1) !== '#') &&
+    (findSeat(seating, pos, -1, 0) !== '#') &&
     (seat(seating, x, y) === 'L') &&
-    (seat(seating, x+1, y) !== '#') &&
-    (seat(seating, x-1, y+1) !== '#') &&
-    (seat(seating, x, y+1) !== '#') &&
-    (seat(seating, x+1, y+1) !== '#')
+    (findSeat(seating, pos, 1, 0) !== '#') &&
+    (findSeat(seating, pos, -1, 1) !== '#') &&
+    (findSeat(seating, pos, 0, 1) !== '#') &&
+    (findSeat(seating, pos, 1, 1) !== '#')
     )
 }
 
-const isOccupied = (seating, pos) => {
+const isOccupied = (seating, pos, limit) => {
     let {x, y} = translate(pos)
     let adjacentOcc = 0
     
-    adjacentOcc = seat(seating, x-1, y-1) === '#' ? adjacentOcc+1 : adjacentOcc
-    adjacentOcc = seat(seating, x, y-1) === '#' ? adjacentOcc+1 : adjacentOcc
-    adjacentOcc = seat(seating, x+1, y-1) === '#' ? adjacentOcc+1 : adjacentOcc
-    adjacentOcc = seat(seating, x-1, y) === '#' ? adjacentOcc+1 : adjacentOcc
-    adjacentOcc = seat(seating, x+1, y) === '#' ? adjacentOcc+1 : adjacentOcc
-    adjacentOcc = seat(seating, x-1, y+1) === '#' ? adjacentOcc+1 : adjacentOcc
-    adjacentOcc = seat(seating, x, y+1) === '#' ? adjacentOcc+1 : adjacentOcc
-    adjacentOcc = seat(seating, x+1, y+1) === '#' ? adjacentOcc+1 : adjacentOcc
-    let bool = (seat(seating, x, y) === '#' && adjacentOcc >= 4) ? true : false
+    adjacentOcc = findSeat(seating, pos, -1, -1) === '#' ? adjacentOcc+1 : adjacentOcc
+    adjacentOcc = findSeat(seating, pos, 0, -1) === '#' ? adjacentOcc+1 : adjacentOcc
+    adjacentOcc = findSeat(seating, pos, 1, -1) === '#' ? adjacentOcc+1 : adjacentOcc
+    adjacentOcc = findSeat(seating, pos, -1, 0) === '#' ? adjacentOcc+1 : adjacentOcc
+    adjacentOcc = findSeat(seating, pos, 1, 0) === '#' ? adjacentOcc+1 : adjacentOcc
+    adjacentOcc = findSeat(seating, pos, -1, 1) === '#' ? adjacentOcc+1 : adjacentOcc
+    adjacentOcc = findSeat(seating, pos, 0, 1) === '#' ? adjacentOcc+1 : adjacentOcc
+    adjacentOcc = findSeat(seating, pos, 1, 1) === '#' ? adjacentOcc+1 : adjacentOcc
+    let bool = (seat(seating, x, y) === '#' && adjacentOcc >= limit) ? true : false
     return {
         occupied: bool,
         adjacentCnt: adjacentOcc
@@ -69,7 +89,7 @@ const sit = (seating) => {
         if(isEmpty(seating, pos)){
             clone[pos] = '#'
         }
-        if(isOccupied(seating, pos).occupied){
+        if(isOccupied(seating, pos, 4).occupied){
             clone[pos] = 'L'
         }
     }
@@ -112,12 +132,19 @@ const occupiedSeats = (seating) => {
     return count
 }
 
+const printSeating = (seating) => {
+    for(let j = 0; j<seating.length; j+=width){
+        console.log(seating.slice(j, j+width).toString().replace(/,/gi,''))
+    }
+    console.log(' ')
+}
+
 const doPartOne = (seating) => {
     let before = seating
     let cnt = 0
     while(true){
         seating = sit(seating)
-        cnt++
+        //printSeating(seating)
         if(seating.equalsOr(before)){
             return {
                 cnt,
@@ -125,6 +152,7 @@ const doPartOne = (seating) => {
                 occupiedSeats : occupiedSeats(seating)
             }
         }
+        cnt++
         before = seating
     }
 }
